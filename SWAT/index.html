@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>등대 탐험 게임</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: dark; }
+    html, body { height: 100%; }
+    body { font-family: 'Noto Sans KR', system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple SD Gothic Neo", "Noto Sans KR"; }
+    .fade-in { animation: fadeIn .5s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    .soft-glow { box-shadow: 0 0 0 1px rgba(251,191,36,.08), 0 10px 40px rgba(0,0,0,.35), inset 0 0 80px rgba(255,255,255,.02); }
+  </style>
+</head>
+<body class="min-h-screen bg-[url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center">
+  <div class="min-h-screen bg-black/50 flex items-center justify-center p-4">
+    <main id="app" class="w-full max-w-xl mx-auto bg-slate-900/60 backdrop-blur rounded-2xl border border-white/10 p-5 sm:p-6 text-slate-100 soft-glow fade-in"></main>
+  </div>
+
+  <script>
+  // --- 저장 유틸 (localStorage + sessionStorage + cookie) ---
+  const STORE_KEY = 'lighthouse_state_v2';
+  function saveState(state){
+    const s = JSON.stringify(state);
+    localStorage.setItem(STORE_KEY, s);
+    sessionStorage.setItem(STORE_KEY, s);
+    document.cookie = `${STORE_KEY}=${encodeURIComponent(s)}; path=/; max-age=${60*60*24*30}`; // 30일
+  }
+  function loadState(){
+    const fromLocal = localStorage.getItem(STORE_KEY);
+    if(fromLocal){
+      try { return JSON.parse(fromLocal); } catch(e){}
+    }
+    const match = document.cookie.match(new RegExp('(^| )'+STORE_KEY+'=([^;]+)'));
+    if(match){ try { return JSON.parse(decodeURIComponent(match[2])); } catch(e){} }
+    return null;
+  }
+  function clearState(){
+    localStorage.removeItem(STORE_KEY);
+    sessionStorage.removeItem(STORE_KEY);
+    document.cookie = `${STORE_KEY}=; Max-Age=0; path=/`;
+  }
+
+  // --- 데이터 모델 ---
+  const FLOORS = {
+    1: {
+      title: '1층 — 입구·관리 구역',
+      arrivalStory: '무거운 문을 열자 습기와 오래된 기름 냄새가 밀려온다. 벽에는 바랜 표지판이 걸려 있고, 손질이 덜 된 흔적이 보인다.',
+      backLabel: '이전 단계',
+      surveyLabel: '1층을 조사하기',
+      places: [
+        {name: '출입문', result: '잠금 상태는 정상이다. 불빛 흔들림과의 연관성은 낮다.'},
+        {name: '보관 창고', result: '낡은 연료통과 마모된 장비가 보인다. 관리 주기 축소가 의심된다.'},
+        {name: '연료통 보관실', result: '연료통 표면에 미세한 균열과 염분 결정이 보인다. 즉각적인 원인은 아니나, 염분 유입과 유지보수 지연의 신호다.'},
+        {name: '발전기실', result: '출력과 주파수는 안정적이다. 단기 로그에 전압 강하 흔적은 없다.'}
+      ]
+    },
+    2: {
+      title: '2층 — 관제·기록 구역',
+      arrivalStory: '좁은 복도를 지나 관제실에 들어서면 먼지 쌓인 기록지 사이로 바람이 스민다. 희미한 흔들림이 벽을 따라 지나간다.',
+      backLabel: '이전 단계',
+      surveyLabel: '2층을 조사하기',
+      places: [
+        {name: '관제실 책상', result: '최근 점검표에서 결로 경보 센서 항목이 사라졌다. 점검 범위 축소 정황이다.'},
+        {name: '창문', result: '창틀 패킹이 경화되어 해풍이 직접 들어온다. 염분과 습기의 유입 통로다.'},
+        {name: '낡은 전등', result: '내부 조명만 간헐적으로 깜빡인다. 등대 외부 광원과는 직접 관련 없다.'},
+        {name: '무전기 옆 서랍', result: '미세 부식 재발 보고서가 반복된다. 조치 이력은 빈약하고 비용 절감 표시가 보인다.'}
+      ]
+    },
+    3: {
+      title: '3층 — 불빛 핵심 구역',
+      arrivalStory: '프레넬 렌즈가 빛을 모으고 반사판이 바다로 쏘아 보낸다. 공기에는 염분기와 습기가 남아 있다.',
+      backLabel: '이전 단계',
+      surveyLabel: '3층을 조사하기',
+      places: [
+        {name: '나선형 계단', result: '난간에 염분 백화가 보인다. 구조 안전 이슈이지만 직접 원인은 아니다.'},
+        {name: '렌즈 청소 도구함', result: '도구 배치가 어긋나 있고 청소 주기가 길어진 흔적이 있다.'},
+        {name: '불빛 반사판 뒤편', result: '소금가루와 먼지가 남아 있다. 바람길이 제어부 쪽으로 형성된 흔적이다.'},
+        {name: '제어 패널', result: '보호 패킹 손상으로 결로가 유입되었다. 배선 일부가 부식되어 접촉 불량이 발생한다.'}
+      ]
+    }
+  };
+
+  // --- 초기 상태 ---
+  const initialState = {
+    screen: 'home', // 'home' | 'floor' | 'placeResult' | 'gatePrompt' | 'repair' | 'success'
+    floor: 1,
+    lastPlace: null,
+    surveyOpen: {1:false, 2:false, 3:false}, // 층별 조사 패널 오픈 여부
+    visited: {1:[], 2:[], 3:[]} // 층별 방문 장소 목록
+  };
+
+  let state = loadState() || initialState;
+
+  // --- 헬퍼 ---
+  function allVisitedOnFloor(floor){
+    const total = FLOORS[floor].places.length;
+    const visited = new Set(state.visited[floor] || []);
+    return visited.size >= total;
+  }
+  function isVisited(floor, name){
+    return (state.visited[floor] || []).includes(name);
+  }
+
+  // --- 렌더러 ---
+  const $app = document.getElementById('app');
+
+  function render(){
+    saveState(state);
+    if(state.screen === 'home') return renderHome();
+    if(state.screen === 'floor') return renderFloor(state.floor);
+    if(state.screen === 'placeResult') return renderPlaceResult();
+    if(state.screen === 'gatePrompt') return renderGatePrompt();
+    if(state.screen === 'repair') return renderRepair();
+    if(state.screen === 'success') return renderSuccess();
+  }
+
+  function buttonBase(cls=''){ return `inline-flex items-center justify-center px-4 py-4 text-base sm:text-lg font-semibold rounded-xl transition focus:outline-none focus:ring-2 focus:ring-yellow-300/40 ${cls}`; }
+
+  function renderHome(){
+    $app.innerHTML = `
+      <section class="space-y-6 fade-in">
+        <header class="space-y-2">
+          <h1 class="text-2xl sm:text-3xl font-bold text-yellow-300">등대 탐험 게임</h1>
+          <p class="text-base sm:text-lg text-slate-200 leading-relaxed">등대의 불빛이 간헐적으로 흔들린다. 원인을 특정하려면 모든 층을 체계적으로 확인해야 한다. 작은 단서라도 놓치면 항로는 다시 어둠에 갇힌다.</p>
+        </header>
+        <div class="flex gap-3">
+          <button class="${buttonBase('bg-amber-600 hover:bg-amber-500') }" onclick="gotoFloor(1)">🔍 원인 조사</button>
+          <button class="${buttonBase('bg-slate-700 hover:bg-slate-600')}" onclick="resetProgress()">초기화</button>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderFloor(floor){
+    const f = FLOORS[floor];
+    const placesHtml = f.places.map(p => {
+      const visited = isVisited(floor, p.name);
+      const baseCls = visited ? 'bg-slate-700 text-slate-300 hover:bg-slate-700' : 'bg-slate-800 hover:bg-slate-700';
+      return `<li class=\"mb-2\"><button class=\"${buttonBase('w-full '+baseCls+' text-left')}\" onclick=\"investigate('${p.name.replace(/'/g, "&#39;")}')\">${p.name}${visited ? ' <span class=\\"ml-2 text-xs text-slate-400\\">(확인됨)</span>' : ''}</button></li>`;
+    }).join('');
+
+    const backBtn = `<button class=\"${buttonBase('bg-slate-700 hover:bg-slate-600')}\" onclick=\"goBackFromFloor(${floor})\">${f.backLabel}</button>`;
+    const surveyBtn = `<button class=\"${buttonBase('bg-amber-600 hover:bg-amber-500')}\" onclick=\"openSurvey(${floor})\">${f.surveyLabel}</button>`;
+
+    $app.innerHTML = `
+      <section class=\"space-y-6 fade-in\">
+        <header class=\"space-y-2\">
+          <h2 class=\"text-xl sm:text-2xl font-bold text-yellow-300\">${f.title}</h2>
+          <p class=\"text-base sm:text-lg leading-relaxed\">${f.arrivalStory}</p>
+        </header>
+
+        <div class=\"flex gap-3\">${backBtn}${surveyBtn}</div>
+
+        ${ state.surveyOpen[floor]
+          ? `
+            <section id=\"places\" class=\"space-y-3\">
+              <h3 class=\"text-lg sm:text-xl font-semibold text-slate-100\">조사 장소</h3>
+              <ul class=\"list-none\">${placesHtml}</ul>
+              <p class=\"text-sm text-slate-300\">장소 버튼을 눌러 결과를 확인한다.</p>
+            </section>
+          `
+          : `
+            <p class=\"text-sm text-slate-300\">[${f.surveyLabel}] 버튼을 눌러 이 층의 조사 장소를 확인한다.</p>
+          `
+        }
+
+        ${ allVisitedOnFloor(floor) ? gateNoticeHtml(floor) : ''}
+      </section>
+    `;
+  }
+
+  function gateNoticeHtml(floor){
+    const nextFloor = floor < 3 ? (floor + 1) : null;
+    const stayLabel = `${floor}층에 머무르기`;
+    const goLabel = nextFloor ? `${nextFloor}층으로 올라가기` : '수리하러 가기';
+    const goAction = nextFloor ? `gotoFloor(${nextFloor})` : `gotoRepair()`;
+    return `
+      <div class=\"mt-4 p-4 bg-emerald-900/20 border border-emerald-400/30 rounded-xl\">
+        <p class=\"mb-3\">이 층의 모든 조사를 마쳤다. 다음 단계로 진행할까?</p>
+        <div class=\"flex gap-3\">
+          <button class=\"${buttonBase('bg-slate-700 hover:bg-slate-600')}\" onclick=\"gotoFloor(${floor})\">${stayLabel}</button>
+          <button class=\"${buttonBase('bg-amber-600 hover:bg-amber-500')}\" onclick=\"${goAction}\">${goLabel}</button>
+        </div>
+      </div>`;
+  }
+
+  function renderPlaceResult(){
+    const f = FLOORS[state.floor];
+    const place = f.places.find(p => p.name === state.lastPlace);
+    $app.innerHTML = `
+      <section class="space-y-6 fade-in">
+        <header class="space-y-2">
+          <p class="text-sm text-slate-300">${f.title}</p>
+          <h3 class="text-xl sm:text-2xl font-bold text-yellow-300">${place.name}</h3>
+        </header>
+        <article class="text-base sm:text-lg leading-relaxed">${place.result}</article>
+        <div class="flex gap-3">
+          <button class="${buttonBase('bg-slate-700 hover:bg-slate-600')}" onclick="gotoFloor(${state.floor})">← 돌아가기</button>
+          ${ allVisitedOnFloor(state.floor) ? `<button class="${buttonBase('bg-amber-600 hover:bg-amber-500')}" onclick="gotoGatePrompt()">다음 단계 확인</button>` : ''}
+        </div>
+      </section>
+    `;
+  }
+
+  function renderGatePrompt(){
+    const floor = state.floor;
+    $app.innerHTML = `
+      <section class=\"space-y-6 fade-in\">
+        <header>
+          <h3 class=\"text-xl sm:text-2xl font-bold text-yellow-300\">다음 단계로 진행</h3>
+        </header>
+        <p class=\"text-base sm:text-lg\">이 층의 모든 조사를 마쳤다. 다음 층으로 올라갈까?</p>
+        <div class=\"flex gap-3\">
+          <button class=\"${buttonBase('bg-slate-700 hover:bg-slate-600')}\" onclick=\"gotoFloor(${floor})\">${floor}층에 머무르기</button>
+          ${ floor < 3
+            ? `<button class=\"${buttonBase('bg-amber-600 hover:bg-amber-500')}\" onclick=\"gotoFloor(${floor+1})\">${floor+1}층으로 올라가기</button>`
+            : `<button class=\"${buttonBase('bg-amber-600 hover:bg-amber-500')}\" onclick=\"gotoRepair()\">수리하러 가기</button>`
+          }
+        </div>
+      </section>
+    `;
+  }
+
+  function renderRepair(){
+    // 3층에서 모든 장소 조사 후 접근
+    const options = ['연료통 보관실','발전기실','낡은 전등','제어 패널'];
+    const list = options.map((o,i)=>`<li class=\"mb-2\"><span class=\"inline-flex min-w-[1.75rem] justify-center font-semibold text-slate-900 bg-yellow-300 rounded mr-2\">${i+1}</span>${o}</li>`).join('');
+    $app.innerHTML = `
+      <section class=\"space-y-6 fade-in\">
+        <header class=\"space-y-2\">
+          <h2 class=\"text-xl sm:text-2xl font-bold text-yellow-300\">수리하러 가기</h2>
+          <p class=\"text-base sm:text-lg\">근본적인 문제 해결을 위해 수리할 곳을 정확히 입력하라.</p>
+        </header>
+
+        <div class=\"p-4 rounded-xl border border-white/10 bg-slate-800/60\">
+          <p class=\"mb-3 text-sm text-slate-300\">관련 선택지</p>
+          <ul class=\"text-base sm:text-lg leading-relaxed list-none\">${list}</ul>
+        </div>
+
+        <label class=\"block text-sm text-slate-300\">정확히 입력(띄어쓰기 포함 완전 일치)</label>
+        <input id=\"repairInput\" type=\"text\" placeholder=\"예: 제어 패널\" class=\"w-full rounded-xl bg-slate-800/70 border border-white/10 px-4 py-3 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-yellow-300/40\" />
+        <div class=\"flex gap-3\">
+          <button class=\"${buttonBase('bg-amber-600 hover:bg-amber-500')}\" onclick=\"submitRepair()\">수리 실행</button>
+          <button class=\"${buttonBase('bg-slate-700 hover:bg-slate-600')}\" onclick=\"gotoFloor(3)\">3층으로 돌아가기</button>
+          <button class=\"${buttonBase('bg-slate-700 hover:bg-slate-600')}\" onclick=\"gotoFloor(2)\">2층으로 돌아가기</button>
+        </div>
+        <p id=\"repairError\" class=\"hidden text-rose-300 text-sm\">해당 장소를 찾을 수 없습니다. 정확한 이름을 입력해주세요.</p>
+      </section>
+    `;
+    setTimeout(()=>document.getElementById('repairInput').focus(), 0);
+  }
+
+  function renderSuccess(){
+    $app.innerHTML = `
+      <section class=\"space-y-7 text-center fade-in\">
+        <div class=\"mx-auto w-28 h-28 rounded-full bg-yellow-300 flex items-center justify-center animate-pulse\">
+          <span class=\"text-5xl\">💡</span>
+        </div>
+        <h2 class=\"text-2xl sm:text-3xl font-extrabold text-yellow-300\">근본 원인 해결</h2>
+        <p class=\"text-base sm:text-lg leading-relaxed\">제어 패널의 손상된 배선을 수리하였다. 또한 창틀 패킹 교체와 점검 항목 복원을 통해 염분·습기 유입과 관리 주기 축소라는 근본 원인에 대한 지속 조치를 마련하였다. 등대의 불빛은 다시 안정적으로 바다를 비춘다.</p>
+        <div class=\"p-7 sm:p-8 bg-emerald-900/25 border-2 border-yellow-300/60 rounded-3xl shadow-inner ring-2 ring-yellow-300/30\">
+          <p class=\"text-3xl sm:text-4xl font-extrabold tracking-tight text-yellow-300\">Ground Rule 3</p>
+          <p class=\"mt-2 text-4xl sm:text-6xl font-black text-white drop-shadow\">문제는 끝까지 추적해 해결한다</p>
+          <p class=\"text-sm text-slate-300\">Gruond Rule 보드 3번을 작성해주세요.</p>
+        </div>
+        <div class=\"flex justify-center gap-3\">
+          <button class=\"${buttonBase('bg-slate-700 hover:bg-slate-600')}\" onclick=\"goHome()\">🏠 홈으로</button>
+          <button class=\"${buttonBase('bg-slate-700 hover:bg-slate-600')}\" onclick=\"resetProgress()\">초기화</button>
+        </div>
+      </section>
+    `;
+  }
+
+  // --- 동작 함수 ---
+  function gotoFloor(f){
+    state.screen = 'floor';
+    state.floor = f;
+    state.lastPlace = null;
+    // 조사 패널 상태 유지: 이미 한 번 열었으면 유지, 처음 가는 층은 기본 false
+    if(typeof state.surveyOpen[f] !== 'boolean') state.surveyOpen[f] = false;
+    render();
+  }
+  function openSurvey(f){ state.surveyOpen[f] = true; render(); }
+  function goHome(){ state.screen = 'home'; render(); }
+  function goBackFromFloor(f){
+    if(f > 1){
+      gotoFloor(f-1);
+    } else {
+      goHome();
+    }
+  }
+  function investigate(placeName){
+    const f = FLOORS[state.floor];
+    const place = f.places.find(p => p.name === placeName);
+    if(!place){ return; }
+    state.lastPlace = place.name;
+    // 방문 기록
+    const list = state.visited[state.floor] || [];
+    if(!list.includes(place.name)) list.push(place.name);
+    state.visited[state.floor] = list;
+    state.screen = 'placeResult';
+    render();
+  }
+  function gotoGatePrompt(){ state.screen = 'gatePrompt'; render(); }
+
+  function gotoRepair(){
+    // 3층 모든 장소 조사 후 진입 가능
+    if(!allVisitedOnFloor(3)) return;
+    state.screen = 'repair';
+    render();
+  }
+
+  function submitRepair(){
+    const val = (document.getElementById('repairInput').value || '').trim();
+    const ok = val === '제어 패널';
+    const $err = document.getElementById('repairError');
+    if(!ok){
+      $err.classList.remove('hidden');
+      return;
+    }
+    $err.classList.add('hidden');
+    state.screen = 'success';
+    render();
+  }
+
+  function resetProgress(){
+    state = JSON.parse(JSON.stringify(initialState));
+    clearState();
+    render();
+  }
+
+  // 진입
+  render();
+  </script>
+</body>
+</html>
