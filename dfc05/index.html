@@ -11,7 +11,7 @@
   <style>
     :root { color-scheme: dark; }
     body { font-family: 'Noto Sans KR', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    .card { background: rgba(15,23,42,0.75); backdrop-filter: blur(8px); }
+    .card { background: rgba(15,23,42,0.78); backdrop-filter: blur(8px); }
     .fade-in { animation: fade .25s ease-out; }
     @keyframes fade {
       from { opacity: 0; transform: translateY(6px); }
@@ -28,93 +28,91 @@
     const scenarios = [
       {
         id: 1,
+        title: '1. 영업팀 – 대형 고객 불만 발생 직후',
         prompt: `어제 납품된 제품에서 사소한 흠집이 발견되었다며 대형 고객이 항의 전화를 했다. 담당자는 출장을 가 있어 현장 확인이 어렵다. 상사는 “내일 아침 회의 후 대응하자”고 말한다.`,
         options: [
           '① 내일 회의 후 보고 및 대응한다',
           '② 오늘 중 담당 대리인을 보내고 전화로 사과한다'
         ],
         answer: 2,
-        feedback: `고객 중심: 불만은 시간이 지날수록 감정이 증폭된다. 즉시 대응이 신뢰를 지킨다.`
+        feedback: '고객 중심: 불만은 시간이 지날수록 감정이 증폭된다. 즉시 대응이 신뢰를 지킨다.'
       },
       {
         id: 2,
+        title: '2. 생산팀 – 공정 이상 신호 발생',
         prompt: `자동화 라인에서 경고음이 잠깐 울렸다가 사라졌다. 모니터에는 ‘경미한 압력 이상’으로 표시된다. 팀장은 납기일을 맞추기 위해 계속 가동을 지시한다.`,
         options: [
-          '① 지시대로 가동을 계속한다',
-          '② 설비를 즉시 정지하고 원인을 점검한다'
+          '① 설비를 즉시 정지하고 원인을 점검한다',
+          '② 지시대로 가동을 계속한다'
         ],
-        answer: 2,
-        feedback: `근본 원인: ‘작은 이상’이 ‘큰 사고’로 커지는 것은 시간문제이다. 즉시 대응이 진짜 절감이다.`
+        answer: 1,
+        feedback: '근본원인: “작은 이상”이 “큰 사고”로 커지는 것은 시간문제이다. 즉시 대응이 진짜 절감이다.'
       },
       {
         id: 3,
+        title: '3. 마케팅 – 캠페인 오타 발견',
         prompt: `3만 명에게 발송된 이메일 제목에 브랜드명 철자 오류가 발견되었다. 수정하려면 재발송과 추가 비용이 발생한다.`,
         options: [
-          '① 그대로 둔다(소수만 볼 것이라 생각한다)',
+          '① 그대로 둔다(소수만 볼 것이라고 생각한다)',
           '② 재발송을 하고 사과 문구를 포함한다'
         ],
         answer: 2,
-        feedback: `고객 신뢰: 브랜드는 ‘세밀함의 기억’으로 남는다. 조기 수정이 장기 비용을 최소화한다.`
+        feedback: '고객 신뢰: 브랜드는 ‘세밀함의 기억’으로 남는다. 조기 수정이 장기 비용을 최소화한다.'
       },
       {
         id: 4,
+        title: '4. 기획 – 경영진 보고 전날 데이터 오류 확인',
         prompt: `다음 날 아침 보고자료 제출을 앞두고 매출 수치가 실제와 다름을 발견했다. 이를 정정하면 제출이 늦어진다.`,
         options: [
           '① 그대로 제출하고 이후에 수정한다',
           '② 즉시 수치를 수정하여 정확하게 보고한다'
         ],
         answer: 2,
-        feedback: `신뢰 중심 의사결정: 빠름보다 바름이 리더에 대한 신뢰를 만든다.`
+        feedback: '신뢰 중심 의사결정: 빠름보다 바름이 리더에 대한 신뢰를 만든다.'
       },
       {
         id: 5,
-        prompt: `주말 저녁, 고객 5명이 같은 오류를 SNS에 게시했다. CS 매뉴얼에는 ‘영업시간 외 대응 불가’라고 명시되어 있다.`,
+        title: '5. 고객지원 – SNS 클레임 폭주',
+        prompt: `주말 저녁, 고객 5명이 같은 오류를 SNS에 게시했다. CS 매뉴얼에는 “영업시간 외 대응 불가”라고 명시되어 있다.`,
         options: [
           '① 월요일에 공식 답변을 올린다',
           '② 담당자가 자발적으로 댓글을 달아 사과하고 안내한다'
         ],
         answer: 2,
-        feedback: `고객 중심 골든타임: 초기 3시간이 위기관리의 생명선이다. 침묵은 방치로 인식된다.`
+        feedback: '고객 중심 골든타임: 초기 3시간이 위기관리의 생명선이다. 침묵은 방치로 인식된다.'
       },
       {
         id: 6,
-        prompt: `회의 도중 구성원 간 언성이 높아지고 서로를 비난하기 시작했다. 회의의 목적은 의사결정이었지만 분위기가 급격히 악화되었다.`,
+        title: '6. 리더(팀장) – 팀 내 갈등 회의',
+        prompt: `회의 도중 구성원 간 언성이 높아지고 서로를 비난하기 시작했다. 회의의 목적은 의사결정이었지만 분위기가 급격히 악화되고 있다.`,
         options: [
           '① 회의가 끝난 뒤 따로 불러 대화한다',
           '② 회의를 즉시 중단하고 감정을 조율한다'
         ],
         answer: 2,
-        feedback: `리더십 골든타임: 신뢰 붕괴는 감정이 올라올 때 시작된다. 즉시 중재가 리더의 타이밍이다.`
+        feedback: '리더십 골든타임: 신뢰 붕괴는 감정이 올라올 때 시작된다. 즉시 중재가 리더의 타이밍이다.'
       },
       {
         id: 7,
+        title: '7. 인사운영팀 – 평가결과 오류 항의',
         prompt: `한 직원이 본인의 평가 점수에 오류가 있다고 제기했다. 이를 검증하려면 하루 이상이 소요된다.`,
         options: [
-          '① 검증을 마친 뒤에 결과를 알려준다',
-          '② 즉시 확인 중임을 알리고 예상 일정을 안내한다'
+          '① 즉시 확인 중임을 알리고 예상 일정을 안내한다',
+          '② 검증을 마친 뒤에 결과를 알려준다'
         ],
-        answer: 2,
-        feedback: `관계관리 타이밍: 피드백은 ‘즉시 반응’이 핵심이다. 침묵은 불신으로 변한다.`
+        answer: 1,
+        feedback: '관계관리 타이밍: 피드백은 ‘즉시 반응’이 핵심이다. 침묵은 불신으로 변한다.'
       },
       {
         id: 8,
-        prompt: `품질 문제를 해결하려면 추가 예산 투입이 필요하다. 그러나 경영진은 단기 이익을 강하게 압박하고 있다.`,
+        title: '8. 품질팀 – 품질 개선 모니터링',
+        prompt: `품질 개선을 위해 정기적으로 필드 클레임을 모니터링하던 중 두 가지 상황을 확인했다. A부품은 수리 비용이 1억 원이고 하루 평균 3건 발생하며, B부품은 수리 비용이 10만 원이고 하루 평균 20건 발생한다.`,
         options: [
-          '① 예산 집행을 보류한다',
-          '② 품질 개선안을 정리해 보고하고 설득한다'
+          '① A부품부터 개선한다',
+          '② B부품부터 개선한다'
         ],
         answer: 2,
-        feedback: `Long-term Cost: 즉시 비용보다 장기 리스크(브랜드 손상)가 더 크다.`
-      },
-      {
-        id: 9,
-        prompt: `A고객은 단가 인하를 요청하고, B고객은 서비스 개선을 요구한다. 단기 수익만 보면 A고객을 유지하는 것이 유리하다.`,
-        options: [
-          '① A고객의 단가 인하 요구를 수용한다',
-          '② B고객의 서비스 개선을 먼저 추진한다'
-        ],
-        answer: 2,
-        feedback: `Long-term Cost: 서비스 품질이 고객 유지 비용을 줄인다. ‘단기 매출 vs 고객 신뢰’의 균형이 필요하다.`
+        feedback: '고객 최우선: 고객 불만 건수를 최대한 빠르게 줄여 현재 자동차 브랜드의 신뢰를 높인다.'
       }
     ];
 
@@ -138,13 +136,20 @@
         const progress = Math.round((currentIndex / total) * 100);
         app.innerHTML = `
           <header class="mb-6">
-            <div class="flex items-center justify-between gap-3">
-              <h1 class="text-xl sm:text-2xl font-extrabold text-yellow-300">
-                상황 ${currentIndex + 1} / ${total}
-              </h1>
-              <div class="text-sm text-slate-200">
-                권장 판단 선택 수: 
-                <span class="font-bold text-emerald-300">${correctCount}</span> / ${total}
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h1 class="text-lg sm:text-xl font-extrabold text-yellow-300">
+                  ${scenario.title}
+                </h1>
+                <p class="text-xs sm:text-sm text-slate-300 mt-1">
+                  상황 ${currentIndex + 1} / ${total}
+                </p>
+              </div>
+              <div class="text-xs sm:text-sm text-right text-slate-200">
+                권장 판단 선택 수<br/>
+                <span class="font-bold text-emerald-300 text-base sm:text-lg">
+                  ${correctCount} / ${total}
+                </span>
               </div>
             </div>
             <div class="w-full h-2 bg-slate-800 rounded mt-3 overflow-hidden">
@@ -163,7 +168,7 @@
                 ${scenario.options[0]}
               </button>
               <button
-                class="inline-flex w-full justify-center items-center px-5 py-4 text-base sm:text-lg font-semibold rounded-xl bg-amber-600 hover:bg-amber-500 focus:outline-none focus:ring-2 focus:ring-yellow-300/60"
+                class="inline-flex w-full justify-center items-center px-5 py-4 text-base sm:text-lg font-semibold rounded-xl bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-yellow-300/40"
                 onclick="handleChoice(2)"
               >
                 ${scenario.options[1]}
@@ -182,8 +187,8 @@
 
       app.innerHTML = `
         <header class="mb-6">
-          <h1 class="text-xl sm:text-2xl font-extrabold text-yellow-300 mb-2">
-            상황 ${currentIndex + 1} 피드백
+          <h1 class="text-lg sm:text-xl font-extrabold text-yellow-300 mb-1">
+            ${scenario.title}
           </h1>
           <p class="${titleColor} text-base sm:text-lg font-semibold">
             ${title}
@@ -196,11 +201,15 @@
           </section>
           <section class="space-y-2">
             <p class="text-sm font-semibold text-slate-300">이 상황에서의 권장 판단</p>
-            <p class="text-base sm:text-lg text-emerald-300 font-semibold">${recommendText}</p>
+            <p class="text-base sm:text-lg text-emerald-300 font-semibold">
+              ${recommendText}
+            </p>
           </section>
           <section class="space-y-2">
-            <p class="text-sm font-semibold text-slate-300">피드백 기준 / 골든타임 포인트</p>
-            <p class="text-base sm:text-lg leading-relaxed">${scenario.feedback}</p>
+            <p class="text-sm font-semibold text-slate-300">피드백</p>
+            <div class="p-4 rounded-xl border border-yellow-300/60 bg-slate-900/70 text-base sm:text-lg leading-relaxed">
+              ${scenario.feedback}
+            </div>
           </section>
           <div class="flex flex-wrap gap-3 pt-2">
             ${
@@ -209,7 +218,7 @@
                      다음 상황으로
                    </button>`
                 : `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="showSummary()">
-                     최종 결과 보기
+                     Ground Rule 보기
                    </button>`
             }
             <button class="inline-flex px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/30" onclick="restartGame()">
@@ -223,20 +232,35 @@
     function renderSummary() {
       const total = scenarios.length;
       app.innerHTML = `
-        <section class="text-center space-y-6">
-          <h1 class="text-2xl sm:text-3xl font-extrabold text-yellow-300">
-            골든타임 딜레마 게임 결과
-          </h1>
-          <p class="text-base sm:text-lg text-slate-200">
-            총 <span class="font-bold">${total}</span>개 상황 중<br/>
-            권장 판단을 선택한 문항은 
-            <span class="font-extrabold text-emerald-300 text-2xl align-middle">${correctCount}</span>개입니다.
-          </p>
-          <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
-            각 상황에서의 선택은<br/>
-            고객 중심, 근본 원인 대응, 리더십·관계관리 골든타임,<br/>
-            그리고 장기 관점의 비용과 신뢰를 어떻게 바라보는지를 보여 준다.
-          </p>
+        <section class="text-center space-y-7">
+          <div>
+            <p class="text-sm sm:text-base text-slate-300 mb-1">
+              총 ${total}개 상황을 모두 완료했습니다.
+            </p>
+            <p class="text-base sm:text-lg text-slate-200">
+              권장 판단을 선택한 문항 수:
+              <span class="font-extrabold text-emerald-300 text-2xl align-middle">
+                ${correctCount}
+              </span>
+              / ${total}
+            </p>
+          </div>
+
+          <div class="p-6 sm:p-7 rounded-3xl border-2 border-yellow-300/70 bg-emerald-900/40 ring-2 ring-yellow-300/30 shadow-lg space-y-3">
+            <p class="text-xl sm:text-2xl font-extrabold text-yellow-300 tracking-tight">
+              Ground Rule 5
+            </p>
+            <p class="text-2xl sm:text-3xl font-black text-white">
+              이슈 해결의 골든 타임을 지킨다
+            </p>
+            <p class="text-sm sm:text-base text-emerald-100 mt-2 leading-relaxed">
+              문제를 발견했을 때, 대응 시점이 곧 결과의 질을 결정한다.
+              <br class="hidden sm:block" />
+              작게 보이는 신호와 초기 불만일수록 빠르고 정직하게 다루는 것이
+              장기적인 신뢰와 비용을 지키는 핵심이다.
+            </p>
+          </div>
+
           <div class="flex flex-wrap gap-3 justify-center">
             <button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="restartGame()">
               다시 진행하기
