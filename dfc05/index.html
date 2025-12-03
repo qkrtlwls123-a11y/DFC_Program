@@ -116,16 +116,19 @@
       }
     ];
 
+    const PASSING_SCORE = scenarios.length;
     let currentIndex = 0;
     let correctCount = 0;
     let lastChoice = null;
+    let summaryUnlocked = false;
+    let notice = '';
 
     const app = document.getElementById('app');
 
     function render() {
       const total = scenarios.length;
 
-      if (currentIndex >= total && lastChoice === null) {
+      if (summaryUnlocked) {
         return renderSummary();
       }
 
@@ -144,12 +147,6 @@
                 <p class="text-xs sm:text-sm text-slate-300 mt-1">
                   상황 ${currentIndex + 1} / ${total}
                 </p>
-              </div>
-              <div class="text-xs sm:text-sm text-right text-slate-200">
-                권장 판단 선택 수<br/>
-                <span class="font-bold text-emerald-300 text-base sm:text-lg">
-                  ${correctCount} / ${total}
-                </span>
               </div>
             </div>
             <div class="w-full h-2 bg-slate-800 rounded mt-3 overflow-hidden">
@@ -174,6 +171,11 @@
                 ${scenario.options[1]}
               </button>
             </div>
+            ${
+              notice
+                ? `<div class="p-3 rounded-xl bg-rose-900/40 border border-rose-400/60 text-sm sm:text-base text-rose-100">${notice}</div>`
+                : ''
+            }
           </article>
         `;
         return;
@@ -237,18 +239,11 @@
             <p class="text-sm sm:text-base text-slate-300 mb-1">
               총 ${total}개 상황을 모두 완료했습니다.
             </p>
-            <p class="text-base sm:text-lg text-slate-200">
-              권장 판단을 선택한 문항 수:
-              <span class="font-extrabold text-emerald-300 text-2xl align-middle">
-                ${correctCount}
-              </span>
-              / ${total}
-            </p>
           </div>
 
           <div class="p-6 sm:p-7 rounded-3xl border-2 border-yellow-300/70 bg-emerald-900/40 ring-2 ring-yellow-300/30 shadow-lg space-y-3">
             <p class="text-xl sm:text-2xl font-extrabold text-yellow-300 tracking-tight">
-              Ground Rule 5
+              Ground Rule 4
             </p>
             <p class="text-2xl sm:text-3xl font-black text-white">
               이슈 해결의 골든 타임을 지킨다
@@ -272,11 +267,16 @@
 
     function handleChoice(choice) {
       const scenario = scenarios[currentIndex];
-      lastChoice = choice;
       if (choice === scenario.answer) {
+        lastChoice = choice;
         correctCount++;
+        notice = '';
+        render();
+      } else {
+        notice = '권장 판단을 선택해야 피드백을 볼 수 있습니다.';
+        lastChoice = null;
+        render();
       }
-      render();
     }
 
     function nextScenario() {
@@ -286,15 +286,23 @@
     }
 
     function showSummary() {
-      lastChoice = null;
-      currentIndex = scenarios.length;
-      renderSummary();
+      if (correctCount >= PASSING_SCORE) {
+        summaryUnlocked = true;
+        lastChoice = null;
+        renderSummary();
+      } else {
+        notice = 'Ground Rule는 일정 점수 이상 획득 후 확인할 수 있습니다.';
+        lastChoice = null;
+        render();
+      }
     }
 
     function restartGame() {
       currentIndex = 0;
       correctCount = 0;
       lastChoice = null;
+      summaryUnlocked = false;
+      notice = '';
       render();
     }
 
