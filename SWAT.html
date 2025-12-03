@@ -133,8 +133,7 @@
   function renderFloor(floor){
     const f = FLOORS[floor];
     const placesHtml = f.places.map(p => {
-      const tag = p.important ? '<span class="ml-2 text-xs px-2 py-0.5 rounded bg-yellow-300/20 text-yellow-300 align-middle">핵심</span>' : '';
-      return `<li class="mb-2"><button class="${buttonBase('w-full bg-slate-800 hover:bg-slate-700 text-left')}" onclick="investigate('${p.name.replace(/'/g, "&#39;")}')">${p.name}${tag}</button></li>`;
+      return `<li class="mb-2"><button class="${buttonBase('w-full bg-slate-800 hover:bg-slate-700 text-left')}" onclick="investigate('${p.name.replace(/'/g, "&#39;")}')">${p.name}</button></li>`;
     }).join('');
 
     // 상단 두 개 버튼: 이전 단계, X층을 조사하기
@@ -155,7 +154,7 @@
         <section id="places" class="space-y-3">
           <h3 class="text-lg sm:text-xl font-semibold text-slate-100">조사 장소</h3>
           <ul class="list-none">${placesHtml}</ul>
-          <p class="text-sm text-slate-300">장소명을 누르면 결과가 표시된다. <span class="text-yellow-300">핵심</span> 표시는 다음 층으로 가기 위한 필수 단서이다.</p>
+          <p class="text-sm text-slate-300">장소명을 누르면 결과가 표시된다.</p>
         </section>
 
         ${ state.clues[floor] ? gateNoticeHtml(floor) : ''}
@@ -182,12 +181,11 @@
   function renderPlaceResult(){
     const f = FLOORS[state.floor];
     const place = f.places.find(p => p.name === state.lastPlace);
-    const importantBadge = place?.important ? '<span class="ml-2 text-xs px-2 py-0.5 rounded bg-yellow-300/20 text-yellow-300">핵심 단서 확보</span>' : '';
     $app.innerHTML = `
       <section class="space-y-6 fade-in">
         <header class="space-y-2">
           <p class="text-sm text-slate-300">${f.title}</p>
-          <h3 class="text-xl sm:text-2xl font-bold text-yellow-300">${place.name}${importantBadge}</h3>
+          <h3 class="text-xl sm:text-2xl font-bold text-yellow-300">${place.name}</h3>
         </header>
         <article class="text-base sm:text-lg leading-relaxed">${place.result}</article>
         <div class="flex gap-3">
@@ -233,8 +231,8 @@
           <ul class="text-base sm:text-lg leading-relaxed list-none">${list}</ul>
         </div>
 
-        <label class="block text-sm text-slate-300">정확히 입력(띄어쓰기 포함 완전 일치)</label>
-        <input id="repairInput" type="text" placeholder="예: 제어 패널" class="w-full rounded-xl bg-slate-800/70 border border-white/10 px-4 py-3 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-yellow-300/40" />
+        <label class="block text-sm text-slate-300">관련 선택지 4개 장소 중 하나를 정확히 입력(띄어쓰기 포함 완전 일치)</label>
+        <input id="repairInput" type="text" class="w-full rounded-xl bg-slate-800/70 border border-white/10 px-4 py-3 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-yellow-300/40" />
         <div class="flex gap-3">
           <button class="${buttonBase('bg-amber-600 hover:bg-amber-500')}" onclick="submitRepair()">수리 지시</button>
           <button class="${buttonBase('bg-slate-700 hover:bg-slate-600')}" onclick="gotoFloor(3)">3층으로 돌아가기</button>
