@@ -116,9 +116,12 @@
       }
     ];
 
+    const PASSING_SCORE = 6;
+
     let currentIndex = 0;
     let correctCount = 0;
     let lastChoice = null;
+    let message = '';
 
     const app = document.getElementById('app');
 
@@ -126,7 +129,10 @@
       const total = scenarios.length;
 
       if (currentIndex >= total && lastChoice === null) {
-        return renderSummary();
+        if (correctCount >= PASSING_SCORE) {
+          return renderSummary();
+        }
+        return renderLockedSummary();
       }
 
       const scenario = scenarios[currentIndex];
@@ -145,12 +151,6 @@
                   상황 ${currentIndex + 1} / ${total}
                 </p>
               </div>
-              <div class="text-xs sm:text-sm text-right text-slate-200">
-                권장 판단 선택 수<br/>
-                <span class="font-bold text-emerald-300 text-base sm:text-lg">
-                  ${correctCount} / ${total}
-                </span>
-              </div>
             </div>
             <div class="w-full h-2 bg-slate-800 rounded mt-3 overflow-hidden">
               <div class="h-2 bg-yellow-300" style="width:${progress}%"></div>
@@ -160,6 +160,11 @@
             <p class="text-base sm:text-lg leading-relaxed whitespace-pre-line">
               ${scenario.prompt}
             </p>
+            ${
+              message
+                ? `<div class="p-4 rounded-xl border border-rose-300/60 bg-rose-900/40 text-sm sm:text-base text-rose-100">${message}</div>`
+                : ''
+            }
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button
                 class="inline-flex w-full justify-center items-center px-5 py-4 text-base sm:text-lg font-semibold rounded-xl bg-slate-700 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-yellow-300/40"
@@ -217,7 +222,7 @@
                 ? `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="nextScenario()">
                      다음 상황으로
                    </button>`
-                : `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="showSummary()">
+                : `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="completeRun()">
                      Ground Rule 보기
                    </button>`
             }
@@ -248,7 +253,7 @@
 
           <div class="p-6 sm:p-7 rounded-3xl border-2 border-yellow-300/70 bg-emerald-900/40 ring-2 ring-yellow-300/30 shadow-lg space-y-3">
             <p class="text-xl sm:text-2xl font-extrabold text-yellow-300 tracking-tight">
-              Ground Rule 5
+              Ground Rule 4
             </p>
             <p class="text-2xl sm:text-3xl font-black text-white">
               이슈 해결의 골든 타임을 지킨다
@@ -270,11 +275,37 @@
       `;
     }
 
+    function renderLockedSummary() {
+      const total = scenarios.length;
+      app.innerHTML = `
+        <section class="text-center space-y-7">
+          <div class="p-6 sm:p-7 rounded-3xl border-2 border-rose-300/70 bg-rose-900/30 ring-2 ring-rose-300/40 shadow-lg space-y-3">
+            <p class="text-xl sm:text-2xl font-extrabold text-rose-200 tracking-tight">
+              Ground Rule 보기 조건 미달
+            </p>
+            <p class="text-base sm:text-lg text-rose-50 leading-relaxed">
+              권장 판단을 <span class="font-bold text-yellow-300">${PASSING_SCORE}개 이상</span> 선택하면 Ground Rule 페이지로 이동할 수 있습니다.<br/>
+              현재 점수: <span class="font-bold text-white">${correctCount} / ${total}</span>
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-3 justify-center">
+            <button class="inline-flex px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/30" onclick="restartGame()">
+              처음부터 다시
+            </button>
+          </div>
+        </section>
+      `;
+    }
+
     function handleChoice(choice) {
       const scenario = scenarios[currentIndex];
-      lastChoice = choice;
       if (choice === scenario.answer) {
+        lastChoice = choice;
         correctCount++;
+        message = '';
+      } else {
+        lastChoice = null;
+        message = '권장 판단을 선택해야 피드백을 볼 수 있습니다. 다시 선택해 주세요.';
       }
       render();
     }
@@ -282,19 +313,21 @@
     function nextScenario() {
       lastChoice = null;
       currentIndex++;
+      message = '';
       render();
     }
 
-    function showSummary() {
+    function completeRun() {
       lastChoice = null;
       currentIndex = scenarios.length;
-      renderSummary();
+      render();
     }
 
     function restartGame() {
       currentIndex = 0;
       correctCount = 0;
       lastChoice = null;
+      message = '';
       render();
     }
 
