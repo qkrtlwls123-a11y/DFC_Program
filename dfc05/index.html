@@ -175,29 +175,17 @@
 
       // 피드백 화면
       const isCorrect = lastChoice === scenario.answer;
-      const title = isCorrect ? '권장 판단입니다.' : '잘못된 선택입니다.';
-      const titleColor = isCorrect ? 'text-emerald-300' : 'text-rose-300';
-      const recommendText = scenario.options[scenario.answer - 1];
 
       app.innerHTML = `
         <header class="mb-6">
-          <h1 class="text-lg sm:text-xl font-extrabold text-yellow-300 mb-1">
+          <h1 class="text-lg sm:text-xl font-extrabold text-yellow-300">
             ${scenario.title}
           </h1>
-          <p class="${titleColor} text-base sm:text-lg font-semibold">
-            ${title}
-          </p>
         </header>
         <article class="space-y-5">
           <section class="space-y-2">
             <p class="text-sm font-semibold text-slate-300">선택한 답변</p>
             <p class="text-base sm:text-lg">${scenario.options[lastChoice - 1]}</p>
-          </section>
-          <section class="space-y-2">
-            <p class="text-sm font-semibold text-slate-300">이 상황에서의 권장 판단</p>
-            <p class="text-base sm:text-lg text-emerald-300 font-semibold">
-              ${recommendText}
-            </p>
           </section>
           ${
             isCorrect
@@ -229,7 +217,7 @@
 
     function renderSummary() {
       const total = scenarios.length;
-      const passed = correctCount >= 6;
+      const passed = correctCount >= total;
 
       app.innerHTML = `
         <section class="text-center space-y-7">
@@ -256,9 +244,9 @@
                      이슈 해결의 골든 타임을 지킨다
                    </p>
                    <p class="text-sm sm:text-base text-emerald-100 mt-2 leading-relaxed">
-                     문제를 발견했을 때, 대응 시점이 곧 결과의 질을 결정한다.
+                     모든 상황에서 권장 판단을 선택하고 각 피드백을 확인했습니다.
                      <br class="hidden sm:block" />
-                     작게 보이는 신호와 초기 불만일수록 빠르고 정직하게 다루는 것이
+                     문제를 발견했을 때, 대응 시점이 곧 결과의 질을 결정한다. 작게 보이는 신호와 초기 불만일수록 빠르고 정직하게 다루는 것이
                      장기적인 신뢰와 비용을 지키는 핵심이다.
                    </p>
                  </div>`
@@ -267,7 +255,7 @@
                      아직 그라운드룰을 확인할 수 없습니다.
                    </p>
                    <p class="text-base sm:text-lg text-white leading-relaxed">
-                     권장 판단을 6개 이상 선택한 뒤에 Ground Rule을 확인할 수 있습니다. 처음부터 다시 진행해주세요.
+                     권장 판단을 모든 문항에서 선택해야 Ground Rule을 확인할 수 있습니다. 처음부터 다시 진행해주세요.
                    </p>
                  </div>`
           }
