@@ -116,6 +116,7 @@
       }
     ];
 
+    const requiredScore = 6;
     let currentIndex = 0;
     let correctCount = 0;
     let lastChoice = null;
@@ -144,12 +145,6 @@
                 <p class="text-xs sm:text-sm text-slate-300 mt-1">
                   상황 ${currentIndex + 1} / ${total}
                 </p>
-              </div>
-              <div class="text-xs sm:text-sm text-right text-slate-200">
-                권장 판단 선택 수<br/>
-                <span class="font-bold text-emerald-300 text-base sm:text-lg">
-                  ${correctCount} / ${total}
-                </span>
               </div>
             </div>
             <div class="w-full h-2 bg-slate-800 rounded mt-3 overflow-hidden">
@@ -181,7 +176,7 @@
 
       // 피드백 화면
       const isCorrect = lastChoice === scenario.answer;
-      const title = isCorrect ? '권장 판단입니다.' : '다른 선택을 하셨습니다.';
+      const title = isCorrect ? '권장 판단입니다.' : '다른 선택을 다시 시도하세요.';
       const titleColor = isCorrect ? 'text-emerald-300' : 'text-rose-300';
       const recommendText = scenario.options[scenario.answer - 1];
 
@@ -199,32 +194,51 @@
             <p class="text-sm font-semibold text-slate-300">선택한 답변</p>
             <p class="text-base sm:text-lg">${scenario.options[lastChoice - 1]}</p>
           </section>
-          <section class="space-y-2">
-            <p class="text-sm font-semibold text-slate-300">이 상황에서의 권장 판단</p>
-            <p class="text-base sm:text-lg text-emerald-300 font-semibold">
-              ${recommendText}
-            </p>
-          </section>
-          <section class="space-y-2">
-            <p class="text-sm font-semibold text-slate-300">피드백</p>
-            <div class="p-4 rounded-xl border border-yellow-300/60 bg-slate-900/70 text-base sm:text-lg leading-relaxed">
-              ${scenario.feedback}
-            </div>
-          </section>
-          <div class="flex flex-wrap gap-3 pt-2">
-            ${
-              currentIndex < scenarios.length - 1
-                ? `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="nextScenario()">
-                     다음 상황으로
-                   </button>`
-                : `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="showSummary()">
-                     Ground Rule 보기
-                   </button>`
-            }
-            <button class="inline-flex px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/30" onclick="restartGame()">
-              처음부터 다시
-            </button>
-          </div>
+          ${
+            isCorrect
+              ? `
+                <section class="space-y-2">
+                  <p class="text-sm font-semibold text-slate-300">이 상황에서의 권장 판단</p>
+                  <p class="text-base sm:text-lg text-emerald-300 font-semibold">
+                    ${recommendText}
+                  </p>
+                </section>
+                <section class="space-y-2">
+                  <p class="text-sm font-semibold text-slate-300">피드백</p>
+                  <div class="p-4 rounded-xl border border-yellow-300/60 bg-slate-900/70 text-base sm:text-lg leading-relaxed">
+                    ${scenario.feedback}
+                  </div>
+                </section>
+                <div class="flex flex-wrap gap-3 pt-2">
+                  ${
+                    currentIndex < scenarios.length - 1
+                      ? `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="nextScenario()">
+                           다음 상황으로
+                         </button>`
+                      : `<button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="showSummary()">
+                           Ground Rule 보기
+                         </button>`
+                  }
+                  <button class="inline-flex px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/30" onclick="restartGame()">
+                    처음부터 다시
+                  </button>
+                </div>
+              `
+              : `
+                <section class="space-y-2">
+                  <p class="text-sm font-semibold text-slate-300">권장 판단을 선택했을 때 피드백이 공개됩니다.</p>
+                  <p class="text-base sm:text-lg text-rose-200">다시 선택해 주세요.</p>
+                </section>
+                <div class="flex flex-wrap gap-3 pt-2">
+                  <button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="retryScenario()">
+                    다시 선택하기
+                  </button>
+                  <button class="inline-flex px-5 py-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/30" onclick="restartGame()">
+                    처음부터 다시
+                  </button>
+                </div>
+              `
+          }
         </article>
       `;
     }
@@ -246,20 +260,35 @@
             </p>
           </div>
 
-          <div class="p-6 sm:p-7 rounded-3xl border-2 border-yellow-300/70 bg-emerald-900/40 ring-2 ring-yellow-300/30 shadow-lg space-y-3">
-            <p class="text-xl sm:text-2xl font-extrabold text-yellow-300 tracking-tight">
-              Ground Rule 5
-            </p>
-            <p class="text-2xl sm:text-3xl font-black text-white">
-              이슈 해결의 골든 타임을 지킨다
-            </p>
-            <p class="text-sm sm:text-base text-emerald-100 mt-2 leading-relaxed">
-              문제를 발견했을 때, 대응 시점이 곧 결과의 질을 결정한다.
-              <br class="hidden sm:block" />
-              작게 보이는 신호와 초기 불만일수록 빠르고 정직하게 다루는 것이
-              장기적인 신뢰와 비용을 지키는 핵심이다.
-            </p>
-          </div>
+          ${
+            correctCount >= requiredScore
+              ? `
+                <div class="p-6 sm:p-7 rounded-3xl border-2 border-yellow-300/70 bg-emerald-900/40 ring-2 ring-yellow-300/30 shadow-lg space-y-3">
+                  <p class="text-xl sm:text-2xl font-extrabold text-yellow-300 tracking-tight">
+                    Ground Rule 4
+                  </p>
+                  <p class="text-2xl sm:text-3xl font-black text-white">
+                    이슈 해결의 골든 타임을 지킨다
+                  </p>
+                  <p class="text-sm sm:text-base text-emerald-100 mt-2 leading-relaxed">
+                    문제를 발견했을 때, 대응 시점이 곧 결과의 질을 결정한다.
+                    <br class="hidden sm:block" />
+                    작게 보이는 신호와 초기 불만일수록 빠르고 정직하게 다루는 것이
+                    장기적인 신뢰와 비용을 지키는 핵심이다.
+                  </p>
+                </div>
+              `
+              : `
+                <div class="p-6 sm:p-7 rounded-3xl border-2 border-rose-400/60 bg-rose-900/30 ring-2 ring-rose-300/40 shadow-lg space-y-3">
+                  <p class="text-xl sm:text-2xl font-extrabold text-rose-100 tracking-tight">
+                    기준 점수에 도달하지 못했습니다.
+                  </p>
+                  <p class="text-base sm:text-lg text-rose-50">
+                    올바른 판단을 더 많이 선택하면 Ground Rule을 확인할 수 있습니다.
+                  </p>
+                </div>
+              `
+          }
 
           <div class="flex flex-wrap gap-3 justify-center">
             <button class="inline-flex px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-base sm:text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-yellow-300/60" onclick="restartGame()">
@@ -282,6 +311,11 @@
     function nextScenario() {
       lastChoice = null;
       currentIndex++;
+      render();
+    }
+
+    function retryScenario() {
+      lastChoice = null;
       render();
     }
 
