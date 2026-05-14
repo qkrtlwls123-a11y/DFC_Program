@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DFC 일하는 방식의 3가지 관점</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --reveal: #3b82f6;
+    --reveal-dark: #1d4ed8;
+    --silos: #10b981;
+    --silos-dark: #047857;
+    --problem: #f97316;
+    --problem-dark: #c2410c;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-500: #64748b;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --gray-900: #0f172a;
+  }
+
+  body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(180deg, #f1f5f9 0%, #e2e8f0 100%);
+    color: var(--gray-800);
+    line-height: 1.6;
+    padding: 32px 16px;
+    min-height: 100vh;
+  }
+
+  .container { max-width: 1280px; margin: 0 auto; }
+
+  .header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 32px 24px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+  .header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--gray-900);
+    letter-spacing: -0.5px;
+  }
+
+  .category {
+    margin-bottom: 28px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+  }
+  .category-header {
+    padding: 22px 32px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .category-icon { font-size: 28px; line-height: 1; }
+  .category-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+
+  .category.reveal .category-header { background: linear-gradient(135deg, var(--reveal), var(--reveal-dark)); }
+  .category.silos .category-header { background: linear-gradient(135deg, var(--silos), var(--silos-dark)); }
+  .category.problem .category-header { background: linear-gradient(135deg, var(--problem), var(--problem-dark)); }
+
+  .category-body { padding: 24px; }
+
+  .situation {
+    margin-bottom: 20px;
+    padding: 22px;
+    background: var(--gray-50);
+    border-radius: 16px;
+  }
+  .situation:last-child { margin-bottom: 0; }
+  .situation-header {
+    margin-bottom: 16px;
+  }
+  .situation-num {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 18px;
+    border-radius: 12px;
+    font-weight: 700;
+    color: white;
+    font-size: 15px;
+    letter-spacing: -0.2px;
+  }
+  .category.reveal .situation-num { background: var(--reveal); }
+  .category.silos .situation-num { background: var(--silos); }
+  .category.problem .situation-num { background: var(--problem); }
+
+  .levels-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 1024px) { .levels-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px)  { .levels-grid { grid-template-columns: 1fr; } }
+
+  .level-card {
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1.5px solid var(--gray-200);
+    background: white;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .level-num {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 12.5px;
+    color: white;
+    letter-spacing: 0.3px;
+    margin-bottom: 12px;
+    align-self: flex-start;
+  }
+  .category.reveal .level-num { background: var(--reveal); }
+  .category.silos .level-num { background: var(--silos); }
+  .category.problem .level-num { background: var(--problem); }
+
+  .level-text {
+    font-size: 15.5px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    flex: 1;
+  }
+
+  @media print {
+    body { background: white; padding: 0; }
+    .category { box-shadow: none; border: 1px solid #e2e8f0; page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>DFC 일하는 방식의 3가지 관점</h1>
+  </div>
+
+  <!-- ========== Reveal Everything ========== -->
+  <section class="category reveal">
+    <div class="category-header">
+      <div class="category-icon">🔵</div>
+      <h2>Reveal Everything</h2>
+    </div>
+    <div class="category-body">
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">Reveal Everything 1</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">발언 자체를 꺼리거나, 실수나 모르는 것에 대해 면박을 주기도 한다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">앞에서는 말 못 하고 뒤에서 불만 이야기하거나 솔직한 의견이 잘 나오지 않는다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">의견을 내는데 대체로 어려움이 없지만 의견을 끝까지 듣지 않고 중간에 자르거나 흘려듣는 경우가 있다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">누구나 편하게 의견을 내고 경청이 팀 안에서 당연하게 여겨진다</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">Reveal Everything 2</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">일단 대세를 따르고 나중에 따로 이야기한다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">분위기를 깨거나 긁어 부스럼을 만들고 싶지 않아 입을 닫는다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">분위기나 눈치를 살피며 조심스럽게 의견을 덧붙인다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">"제 생각은 조금 다릅니다" 또는 "이 부분에 문제가 예상됩니다"라고 편하게 말한다</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">Reveal Everything 3</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">책임 추궁이 두려워 가능하면 덮거나 축소해서 보고하려는 경향이 있다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">이미 문제가 크게 터지거나 기한이 닥쳐서야 알려진다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">혼자 해결해보려다 감당하기 어려워질 때쯤 공유된다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">문제가 감지되자마자 즉시 공유되어 빠르게 개선 방향을 논의한다</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== No Silos ========== -->
+  <section class="category silos">
+    <div class="category-header">
+      <div class="category-icon">🟢</div>
+      <h2>No Silos</h2>
+    </div>
+    <div class="category-body">
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">No Silos 1</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">"내 일이 아니라 다행이다"라는 개인주의적 성향이 강하다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">질책을 받을까 봐 눈치를 보게 되며, "누가 책임질 거야?"라는 긴장감이 든다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">"왜 이런 일이 생겼지?" 원인 파악에 집중한다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">"그럴 수 있지, 같이 해결하자"며 격려하고 지원 사항을 물어본다</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">No Silos 2</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">무능해 보일까 봐 절대 요청하지 않는다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">거절당할까 봐 혹은 실례일까 봐 혼자 고민한다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">바빠 보여 미안하긴 하지만 잘 도와준다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">언제든 물어볼 수 있고 서로 돕는 게 당연하다</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">No Silos 3</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">당장의 실적이나 급한 불을 끄는 데 급급해 근본 원인을 논의할 물리적 시간과 여유가 부족하다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">업무 경계가 불분명해 문제 발생 시 누가 주도적으로 해결해야 할지 구조적으로 헷갈린다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">부서/개인 간 칸막이가 높아, "내 업무 영역만 문제없으면 된다"며 공동의 문제를 외면하는 구조이다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">보고 체계가 복잡하고 결정이 지연되어 문제 해결의 골든타임을 놓치는 경우가 있다</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========== Problem Solving ========== -->
+  <section class="category problem">
+    <div class="category-header">
+      <div class="category-icon">🟠</div>
+      <h2>Problem Solving</h2>
+    </div>
+    <div class="category-body">
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">Problem Solving 1</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">일단 당장 눈앞에 닥친 급한 불을 끄고 표면적으로 수습하는 데 급급하다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">"이 문제가 누구의 책임인지(누구 잘못인지)"를 따지고 방어 논리를 만드는 데 에너지를 쓴다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">문제의 표면적 현상보다, "왜 발생했는지" 근본 원인을 찾는 데 집중한다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">다시는 같은 일이 일어나지 않도록 프로세스나 매뉴얼을 개선하는 데까지 나아간다</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">Problem Solving 2</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">보고 체계가 복잡하거나 결정이 늦어져 실행 타이밍을 놓친다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">"이건 내 일이 아니다"라며 선을 긋거나 주도적으로 나서는 사람이 없어 방치된다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">팀원 간 소통 누락으로 중복 업무를 하거나 맥락(Why)을 모른 채 일한다</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">특정 인원에게 업무가 과중하게 몰리지만, 이를 합리적으로 재분배할 시스템이 부족하다</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="situation">
+        <div class="situation-header"><div class="situation-num">Problem Solving 3</div></div>
+        <div class="levels-grid">
+          <div class="level-card">
+            <span class="level-num">행동 1</span>
+            <div class="level-text">표면적 수습에 머물지 않고 '5 Why' 등을 통해 진짜 원인을 파악하는 프로세스 정립</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 2</span>
+            <div class="level-text">지시나 의사결정 시 그 '배경과 맥락(Why)'을 누락 없이 동기화하는 업무 체계</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 3</span>
+            <div class="level-text">상황 변화나 틈새 업무 발생 시, 권한과 업무를 합리적으로 재분배하는 기준 마련</div>
+          </div>
+          <div class="level-card">
+            <span class="level-num">행동 4</span>
+            <div class="level-text">과거의 시행착오를 숨기지 않고 철저히 분석하여 미래 가치를 창출하는 시스템 정립</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+</body>
+</html>
